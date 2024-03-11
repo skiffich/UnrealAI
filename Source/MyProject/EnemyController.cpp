@@ -3,11 +3,12 @@
 
 #include "EnemyController.h"
 #include "NavigationSystem.h"
+#include "EnemyCharacter.h"
 
 void AEnemyController::BeginPlay()
 {
     Super::BeginPlay();
-    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToRandomWaypoint, 3, false);
+    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToNextPatrolPoint, 3, false);
 }
 
 void AEnemyController::GoToRandomWaypoint()
@@ -31,8 +32,17 @@ void AEnemyController::GoToRandomWaypoint()
     }
 }
 
+void AEnemyController::GoToNextPatrolPoint()
+{
+    AEnemyCharacter* ControllingEnemy = Cast<AEnemyCharacter>(GetPawn());
+    if (ControllingEnemy)
+    {
+        MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
+    }
+}
+
 void AEnemyController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
     Super::OnMoveCompleted(RequestID, Result);
-    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToRandomWaypoint, 3, false);
+    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToNextPatrolPoint, 3, false);
 }

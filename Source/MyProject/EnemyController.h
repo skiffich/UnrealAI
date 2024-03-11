@@ -23,4 +23,7 @@ protected:
 
 	UFUNCTION()
 	void GoToRandomWaypoint();
+
+	UFUNCTION()
+	void GoToNextPatrolPoint();
 };
