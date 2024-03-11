@@ -7,7 +7,7 @@
 void AEnemyController::BeginPlay()
 {
     Super::BeginPlay();
-    GoToRandomWaypoint();
+    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToRandomWaypoint, 3, false);
 }
 
 void AEnemyController::GoToRandomWaypoint()
@@ -34,5 +34,5 @@ void AEnemyController::GoToRandomWaypoint()
 void AEnemyController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
     Super::OnMoveCompleted(RequestID, Result);
-    GoToRandomWaypoint();
+    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToRandomWaypoint, 3, false);
 }

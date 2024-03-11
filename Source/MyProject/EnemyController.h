@@ -14,6 +14,8 @@ class MYPROJECT_API AEnemyController : public AAIController
 {
 	GENERATED_BODY()
 	
+	FTimerHandle RandomWaypointTimerHandle;
+
 protected:
 	virtual void BeginPlay() override;
 
