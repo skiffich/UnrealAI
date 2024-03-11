@@ -37,7 +37,21 @@ void AEnemyController::GoToNextPatrolPoint()
     AEnemyCharacter* ControllingEnemy = Cast<AEnemyCharacter>(GetPawn());
     if (ControllingEnemy)
     {
-        MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
+        if (!ControllingEnemy->IsReachedAllPatrolPoints())
+        {
+            UE_LOG(LogTemp, Display, TEXT("Go to NextPatrolLocation"));
+            MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
+        }
+        else if (!ControllingEnemy->IsReadyToPatrol())
+        {
+            UE_LOG(LogTemp, Display, TEXT("Go to RandomWaypoint"));
+            GoToRandomWaypoint();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Display, TEXT("Go to NextPatrolLocation"));
+            MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
+        }
     }
 }
 

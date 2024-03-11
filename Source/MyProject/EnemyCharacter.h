@@ -16,6 +16,10 @@ protected:
     virtual void BeginPlay() override;
 
 public:
+
+    UPROPERTY(EditAnywhere, Category = "Patrol")
+    int AmountOfMoves = 3;
+
     // MakeEditWidget:
     // Shows a wireframe diamond in-world at an offset relative to the parent actor.
     // It also shows some debug text.
@@ -28,8 +32,12 @@ public:
     UFUNCTION(BlueprintCallable)
     const FVector& GetNextPatrolLocation();
 
+    bool IsReachedAllPatrolPoints();
+    bool IsReadyToPatrol();
+
 private:
     TArray<FVector> PatrolPoints;
 
     int CurrentPatrolIndex = 0;
+    int CurrentMoveIndex = 0;
 };

@@ -33,3 +33,19 @@ const FVector& AEnemyCharacter::GetNextPatrolLocation()
     }
 }
 
+bool AEnemyCharacter::IsReachedAllPatrolPoints()
+{
+    return (PatrolPoints.Num() > 0 && CurrentPatrolIndex >= PatrolPoints.Num());
+}
+
+bool AEnemyCharacter::IsReadyToPatrol()
+{
+    if (CurrentMoveIndex++ >= AmountOfMoves)
+    {
+        CurrentMoveIndex = 0;
+        CurrentPatrolIndex = 0;
+        return true;
+    }
+    return false;
+}
+
