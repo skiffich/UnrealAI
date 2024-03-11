@@ -29,12 +29,6 @@ class MYPROJECT_API AMainCharacter : public AMyBaseCharacter
 	float StartFOV;
 	float DesiredFOV;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class UStaticMeshComponent* EquippedWeapon;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	class UStaticMeshComponent* BackWeapon;
-
 
 public:
 	virtual void Attack() override;
@@ -50,9 +44,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Cannot be in the constructor
-	virtual void OnConstruction(const FTransform& Transform) override;
-
 
 public:	
 	// Called every frame
@@ -60,8 +51,4 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-public:
-	UStaticMeshComponent* GetEquippedWeapon() { return  EquippedWeapon; }
-	virtual void OnMontageBlendEndAttack(UAnimMontage* animMontage, bool bInterrupted) override;
 };

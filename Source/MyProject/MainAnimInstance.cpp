@@ -4,81 +4,62 @@
 #include "MainAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
-#include "MainCharacter.h"
-
-
-
+#include "MyBaseCharacter.h"
 
 void UMainAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	if (OwningPawn == nullptr)
+	if (BaseCharacter == nullptr)
 	{
-		OwningPawn = TryGetPawnOwner();
-
-		if (OwningPawn)
-		{
-			MainCharacter = Cast<AMainCharacter>(OwningPawn);
-		}
-
+		BaseCharacter = Cast<AMyBaseCharacter>(TryGetPawnOwner());
 	}
 }
 
 void UMainAnimInstance::UpdateAnimationProperties(float DeltaTime)
 {
-	if (OwningPawn == nullptr)
+	if (BaseCharacter == nullptr)
 	{
-		OwningPawn = TryGetPawnOwner();
+		BaseCharacter = Cast<AMyBaseCharacter>(TryGetPawnOwner());
 	}
 
-	if (OwningPawn)
+	if (BaseCharacter)
 	{
-		if (MainCharacter == nullptr)
+		bIsCrouching = BaseCharacter->bIsCrouched;
+		bIsAiming = BaseCharacter->bIsAiming;
+
+		if (BaseCharacter->IsAttacking())
 		{
-			MainCharacter = Cast<AMainCharacter>(OwningPawn);
+			// World location of the Right hand socket
+			FTransform RightHandIKTransform = BaseCharacter->GetEquippedWeapon()->GetSocketTransform("RightHandBlockIK");
+			FRotator RightHandIKTrandformRotation;
+			// Convert it to  local space for the left hand, This is done because we’re going to have our right hand move explicitly relative to the left hand, so they stay in sync.
+			BaseCharacter->GetMesh()->TransformToBoneSpace("LeftHand", RightHandIKTransform.GetLocation(), FRotator::ZeroRotator, RightHandIKTrandformLocation, RightHandIKTrandformRotation);
+		}
+		else
+		{
+			// World location of the Right hand socket
+			FTransform RightHandIKTransform = BaseCharacter->GetEquippedWeapon()->GetSocketTransform("RightHandIK");
+			FRotator RightHandIKTrandformRotation;
+			// Convert it to  local space for the left hand, This is done because we’re going to have our right hand move explicitly relative to the left hand, so they stay in sync.
+			BaseCharacter->GetMesh()->TransformToBoneSpace("LeftHand", RightHandIKTransform.GetLocation(), FRotator::ZeroRotator, RightHandIKTrandformLocation, RightHandIKTrandformRotation);
 		}
 
-		if (MainCharacter)
-		{
-			bIsCrouching = MainCharacter->bIsCrouched;
-			bIsAiming = MainCharacter->bIsAiming;
-
-			if (MainCharacter->IsAttacking())
-			{
-				// World location of the Right hand socket
-				FTransform RightHandIKTransform = MainCharacter->GetEquippedWeapon()->GetSocketTransform("RightHandBlockIK");
-				FRotator RightHandIKTrandformRotation;
-				// Convert it to  local space for the left hand, This is done because we’re going to have our right hand move explicitly relative to the left hand, so they stay in sync.
-				MainCharacter->GetMesh()->TransformToBoneSpace("LeftHand", RightHandIKTransform.GetLocation(), FRotator::ZeroRotator, RightHandIKTrandformLocation, RightHandIKTrandformRotation);
-			}
-			else
-			{
-				// World location of the Right hand socket
-				FTransform RightHandIKTransform = MainCharacter->GetEquippedWeapon()->GetSocketTransform("RightHandIK");
-				FRotator RightHandIKTrandformRotation;
-				// Convert it to  local space for the left hand, This is done because we’re going to have our right hand move explicitly relative to the left hand, so they stay in sync.
-				MainCharacter->GetMesh()->TransformToBoneSpace("LeftHand", RightHandIKTransform.GetLocation(), FRotator::ZeroRotator, RightHandIKTrandformLocation, RightHandIKTrandformRotation);
-			}
-		}
-
-
-		FVector Speed = OwningPawn->GetVelocity();
+		FVector Speed = BaseCharacter->GetVelocity();
 		FVector LateralSpeed = FVector(Speed.X, Speed.Y, 0);
 
 		MovementSpeed = LateralSpeed.Size();
 
-		Direction = UKismetAnimationLibrary::CalculateDirection(Speed, OwningPawn->GetActorRotation());
+		Direction = UKismetAnimationLibrary::CalculateDirection(Speed, BaseCharacter->GetActorRotation());
 
-		bIsInAir = OwningPawn->GetMovementComponent()->IsFalling();
+		bIsInAir = BaseCharacter->GetMovementComponent()->IsFalling();
 
-		FRotator PawnRotation = OwningPawn->GetActorRotation();
-		FRotator ControllerRotation = OwningPawn->GetControlRotation();
+		FRotator PawnRotation = BaseCharacter->GetActorRotation();
+		FRotator ControllerRotation = BaseCharacter->GetControlRotation();
 		FRotator DeltaRotation = ControllerRotation - PawnRotation;
 
 		FRotator Interp = FMath::RInterpTo(FRotator(AimPitch, AimYaw, 0), DeltaRotation, DeltaTime, 15);
 		AimPitch = FMath::ClampAngle(Interp.Pitch, -90, 90);
 		AimYaw = FMath::ClampAngle(Interp.Yaw, -90, 90);
-
 	}
 }

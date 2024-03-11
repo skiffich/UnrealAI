@@ -36,17 +36,8 @@ AMainCharacter::AMainCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);  // Rotate at this rate
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;  // Use controller's rotation
 
-	EquippedWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EquippedWeapon"));
-	BackWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BackWeapon"));
-
 	StartFOV = FollowCamera->FieldOfView;
 	DesiredFOV = StartFOV;
-}
-
-void AMainCharacter::OnConstruction(const FTransform& Transform)
-{
-	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GunHoldSocketLeft"));
-	BackWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BackWeaponSocket"));
 }
 
 
@@ -104,9 +95,6 @@ void AMainCharacter::Attack()
 	else
 	{
 		Super::Attack();
-
-		EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("LeftHandBlockSocket"));
 	}
 }
 
@@ -140,19 +128,4 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-void AMainCharacter::OnMontageBlendEndAttack(UAnimMontage* animMontage, bool bInterrupted)
-{
-	if (bInterrupted)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("MY ANIMATION WAS INTERRUPTED!!!!!!!!!!"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("MY ANIMATION IS BLENDING OUT!!!!!!!!!!"));
-
-		EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GunHoldSocketLeft"));
-	}
 }

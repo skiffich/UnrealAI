@@ -19,6 +19,12 @@ class MYPROJECT_API AMyBaseCharacter : public ACharacter
 	void OnOverlapBegin_AttackCapsule(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* EquippedWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* BackWeapon;
+
 private:
 	UFUNCTION()
 	virtual void OnMontageBlendEndAttack(UAnimMontage* animMontage, bool bInterrupted);
@@ -31,6 +37,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Cannot be in the constructor
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -40,6 +49,7 @@ public:
 
 	void ActivateAttack(bool Activate);
 
+	UStaticMeshComponent* GetEquippedWeapon() { return  EquippedWeapon; }
 
 public:
 	/** The attack montage to play */

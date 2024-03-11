@@ -42,10 +42,7 @@ public:
 	bool bIsCrouching;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
-	class APawn* OwningPawn;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
-	class AMainCharacter* MainCharacter;
+	class AMyBaseCharacter* BaseCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
 	FVector RightHandIKTrandformLocation;

@@ -20,6 +20,9 @@ AMyBaseCharacter::AMyBaseCharacter()
 	AttackCapsule->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LeftHandSocket"));
 	AttackCapsule->OnComponentBeginOverlap.AddDynamic(this, &AMyBaseCharacter::OnOverlapBegin_AttackCapsule);
 	AttackCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	EquippedWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EquippedWeapon"));
+	BackWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BackWeapon"));
 }
 
 // Called when the game starts or when spawned
@@ -27,6 +30,12 @@ void AMyBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMesh()->GetAnimInstance()->OnMontageBlendingOut.AddDynamic(this, &AMyBaseCharacter::OnMontageBlendEndAttack);
+}
+
+void AMyBaseCharacter::OnConstruction(const FTransform& Transform)
+{
+	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GunHoldSocketLeft"));
+	BackWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BackWeaponSocket"));
 }
 
 // Called every frame
@@ -80,6 +89,8 @@ void AMyBaseCharacter::Attack()
 			GEngine->AddOnScreenDebugMessage(1, 15.0f, FColor::Red, TEXT("MyBaseCharacter: Cannot play AttackMontage"));
 	}
 
+	EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("LeftHandBlockSocket"));
 }
 
 void AMyBaseCharacter::OnOverlapBegin_AttackCapsule(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -121,10 +132,13 @@ void AMyBaseCharacter::OnMontageBlendEndAttack(UAnimMontage* animMontage, bool b
 {
 	if (bInterrupted)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MY ANIMATION WAS INTERRUPTED!"));
+		UE_LOG(LogTemp, Warning, TEXT("MY ANIMATION WAS INTERRUPTED!!!!!!!!!!"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MY ANIMATION IS BLENDING OUT!"));
+		UE_LOG(LogTemp, Warning, TEXT("MY ANIMATION IS BLENDING OUT!!!!!!!!!!"));
+
+		EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GunHoldSocketLeft"));
 	}
 }
