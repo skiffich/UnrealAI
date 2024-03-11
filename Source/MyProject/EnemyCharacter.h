@@ -23,16 +23,7 @@ public:
     // should be exposed in the viewport as a movable widget.
 
     UPROPERTY(EditAnywhere, Category = "Patrol", Meta = (MakeEditWidget))
-    FVector PatrolPoint1;
-
-    UPROPERTY(EditAnywhere, Category = "Patrol", Meta = (MakeEditWidget))
-    FVector PatrolPoint2;
-
-    UPROPERTY(EditAnywhere, Category = "Patrol", Meta = (MakeEditWidget))
-    FVector PatrolPoint3;
-
-    UPROPERTY(EditAnywhere, Category = "Patrol", Meta = (MakeEditWidget))
-    FVector PatrolPoint4;
+    TArray<FVector> LocalPatrolPoints;
 
     UFUNCTION(BlueprintCallable)
     const FVector& GetNextPatrolLocation();

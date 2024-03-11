@@ -10,17 +10,26 @@ void AEnemyCharacter::BeginPlay()
 
     // We need to get the actor location and add the patrol point to is
     // since these patrol points move with the actor
-    PatrolPoints.Add(PatrolPoint1 + GetActorLocation());
-    PatrolPoints.Add(PatrolPoint2 + GetActorLocation());
-    PatrolPoints.Add(PatrolPoint3 + GetActorLocation());
-    PatrolPoints.Add(PatrolPoint4 + GetActorLocation());
+    for (auto& PatrolPoint : LocalPatrolPoints)
+    {
+        PatrolPoints.Add(PatrolPoint + GetActorLocation());
+    }
 }
 
 const FVector& AEnemyCharacter::GetNextPatrolLocation()
 {
-    if (CurrentPatrolIndex >= PatrolPoints.Num())
+    if (PatrolPoints.Num() > 0)
     {
-        CurrentPatrolIndex = 0;
+        if (CurrentPatrolIndex >= PatrolPoints.Num())
+        {
+            CurrentPatrolIndex = 0;
+        }
+        return PatrolPoints[CurrentPatrolIndex++];
     }
-    return PatrolPoints[CurrentPatrolIndex++];
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("No Patrol Location set for Enemy Actor"));
+        return FVector::ZeroVector;
+    }
 }
+
