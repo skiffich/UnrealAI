@@ -18,6 +18,9 @@ AEnemyCharacter::AEnemyCharacter()
     AttackSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AttackSphere"));
     AttackSphere->SetupAttachment(GetRootComponent());
 
+    ShootSphere = CreateDefaultSubobject<USphereComponent>(TEXT("ShootSphere"));
+    ShootSphere->SetupAttachment(GetRootComponent());
+
     Health = 20.f;
     MaxHealth = 20.f;
     XP = 10;
@@ -41,6 +44,9 @@ void AEnemyCharacter::BeginPlay()
 
     AttackSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::AttackSphereBeginOverlap);
     AttackSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::AttackSphereEndOverlap);
+
+    ShootSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::ShootSphereBeginOverlap);
+    ShootSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::ShootSphereEndOverlap);
 }
 
 const FVector& AEnemyCharacter::GetNextPatrolLocation()
@@ -158,3 +164,34 @@ void AEnemyCharacter::AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComp
         }
     }
 }
+
+void AEnemyCharacter::ShootSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor)
+    {
+        if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
+        {
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->GetBlackboard()->SetValueAsObject(TEXT("ShootActor"), Main);
+            }
+        }
+    }
+}
+
+void AEnemyCharacter::ShootSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    if (OtherActor)
+    {
+        if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
+        {
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->GetBlackboard()->ClearValue(TEXT("ShootActor"));
+            }
+        }
+    }
+}
+

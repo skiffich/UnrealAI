@@ -45,69 +45,6 @@ AMainCharacter::AMainCharacter()
 	XP = 0;
 }
 
-
-void AMainCharacter::Attack()
-{
-	if (Health <= 0.f)
-	{
-		return;
-	}
-
-	if (bIsAiming) // if aiming -> shoot
-	{
-		const float kLineTraceDistance = 10000.f;
-
-		// get the camera view
-		FVector CameraLoc = FollowCamera->GetComponentLocation();
-		FRotator CameraRot = FollowCamera->GetComponentRotation();
-
-		// Determine the start and end of the trace
-		FVector Start = CameraLoc;
-		FVector End = CameraLoc + (CameraRot.Vector() * kLineTraceDistance);
-
-		// additional trace parameters
-		FCollisionQueryParams TraceParams(FName(TEXT("InteractTrace")), true, NULL);
-		TraceParams.bTraceComplex = false;
-
-		//Re-initialize hit info
-		FHitResult HitDetails = FHitResult(ForceInit);
-
-		bool bIsHit = GetWorld()->LineTraceSingleByChannel(
-			HitDetails,				// FHitResult object that will be populated with hit info
-			Start,					// starting position
-			End,					// end position
-			ECC_Camera,				// Camera channel
-			TraceParams				// additional trace settings
-		);
-
-		if (bIsHit) // something was hit
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("We hit something"));
-			// start to end, green, will lines always stay on, depth priority, thickness of line
-			DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Actor Name: %s"), *HitDetails.GetActor()->GetName()));
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Distance: %s"), *FString::SanitizeFloat(HitDetails.Distance)));
-			DrawDebugBox(GetWorld(), HitDetails.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Blue, false, 5.f, ECC_WorldStatic, 1.f);
-
-			UGameplayStatics::ApplyDamage(HitDetails.GetActor(), // Damaged Actor
-				100, // Damage 
-				GetController(), // Instigator (Controller)
-				this, // Damage Causer (Actor)
-				UDamageType::StaticClass()); // default damage type
-		}
-		else // we missed
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Nothing was hit"));
-			// start to end, purple, will lines always stay on, depth priority, thickness of line
-			DrawDebugLine(GetWorld(), Start, End, FColor::Purple, false, 5.f, ECC_WorldStatic, 1.f);
-		}
-	}
-	else
-	{
-		Super::Attack();
-	}
-}
-
 void AMainCharacter::Aim(bool Aim)
 {
 	if (Health <= 0.f)
@@ -165,4 +102,14 @@ void AMainCharacter::DeathEnd()
 {
 	Super::DeathEnd();
 	UKismetSystemLibrary::QuitGame(this, Cast<APlayerController>(GetController()), EQuitPreference::Quit, true);
+}
+
+FVector AMainCharacter::GetShootStartLocation()
+{
+	return FollowCamera->GetComponentLocation();
+}
+
+FRotator AMainCharacter::GetShootRotation()
+{
+	return FollowCamera->GetComponentRotation();
 }

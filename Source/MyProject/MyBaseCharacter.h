@@ -51,6 +51,10 @@ public:
 
 	UStaticMeshComponent* GetEquippedWeapon() { return  EquippedWeapon; }
 
+protected:
+	virtual FVector GetShootStartLocation() { return GetActorLocation(); }
+	virtual FRotator GetShootRotation() { return GetActorRotation(); }
+
 public:
 	/** The attack montage to play */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animations)

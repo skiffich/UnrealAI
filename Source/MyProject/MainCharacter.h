@@ -31,8 +31,6 @@ class MYPROJECT_API AMainCharacter : public AMyBaseCharacter
 
 
 public:
-	virtual void Attack() override;
-
 	virtual void Aim(bool Aim) override;
 
 public:
@@ -57,4 +55,7 @@ public:
 	void SetHealth(float Amount);
 	void AddXP(int32 AddedXP) { XP += AddedXP; }
 
+protected:
+	virtual FVector GetShootStartLocation() override;
+	virtual FRotator GetShootRotation() override;
 };

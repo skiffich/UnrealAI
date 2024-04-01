@@ -75,30 +75,89 @@ void AMyBaseCharacter::ActivateAttack(bool Activate)
 
 void AMyBaseCharacter::Attack()
 {
-	if (AttackMontage)
+	if (Health <= 0.f) { return; }
+
+	if (bIsAiming) // If aiming -> shoot
 	{
-		if (GetCurrentMontage() == nullptr)
+		const float kLineTraceDistance = 10000.f;
+
+		// Determine the start and end of the trace
+		FVector Start = GetShootStartLocation();
+		FVector End = Start + (GetShootRotation().Vector() * kLineTraceDistance);
+
+		// Additional trace parameters
+		FCollisionQueryParams TraceParams(FName(TEXT("InteractTrace")), true, NULL);
+		TraceParams.bTraceComplex = false;
+		TraceParams.AddIgnoredActor(this);
+
+		// Re-initialize hit info
+		FHitResult HitDetails = FHitResult(ForceInit);
+
+		bool bIsHit = GetWorld()->LineTraceSingleByChannel(
+			HitDetails, // FHitResult object that will be populated with hit info
+			Start, // Start position
+			End, // End position
+			ECC_Camera, // Camera channel
+			TraceParams // Additional trace settings
+		);
+
+		if (bIsHit) // something was hit
 		{
-			// Play Animation Montage on the character mesh
-			PlayAnimMontage(AttackMontage);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("We hit something"));
+			DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
+			if (HitDetails.GetActor())
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Actor Name: %s"), *HitDetails.GetActor()->GetName()));
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("No Actor was hit"));
+				DrawDebugBox(GetWorld(), HitDetails.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Blue, false, 5.f, ECC_WorldStatic, 1.f);
+			}
 
+			UGameplayStatics::ApplyDamage(HitDetails.GetActor(), // Damaged Actor
+				25, // Damage
+				GetController(), // Instigator (Controller)
+				this, // Damage Causer (Actor)
+				DamageTypeClass); // default damage type
+		}
+		else // we missed
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Nothing was hit"));
+			DrawDebugLine(GetWorld(), Start, End, FColor::Purple, false, 5.f, ECC_WorldStatic, 1.f);
+		}
+	}
+		// If not aiming -> melee attack
+	else
+	{
+		if (AttackMontage)
+		{
+			if (GetCurrentMontage() == nullptr)
+			{
+				// Play Animation Montage on the character mesh
+				PlayAnimMontage(AttackMontage);
 
-			Aim(false); // Stop Aiming
+				Aim(false); // Stop Aiming
+
+				EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+				EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("LeftHandBlockSocket"));
+			}
+			else
+			{
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Red, TEXT("MyBaseCharacter: AttackMontage already playing"));
+				}
+			}
 		}
 		else
 		{
 			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Red, TEXT("MyBaseCharacter: AttackMontage already playing"));
+			{
+				GEngine->AddOnScreenDebugMessage(1, 15.0f, FColor::Red, TEXT("MyBaseCharacter: Cannot play AttackMontage"));
+			}
 		}
 	}
-	else
-	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(1, 15.0f, FColor::Red, TEXT("MyBaseCharacter: Cannot play AttackMontage"));
-	}
-
-	EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("LeftHandBlockSocket"));
 }
 
 void AMyBaseCharacter::OnOverlapBegin_AttackCapsule(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
