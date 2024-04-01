@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
 	bool bIsCrouching;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float Health;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
 	class AMyBaseCharacter* BaseCharacter;
 

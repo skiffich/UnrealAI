@@ -51,4 +51,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	virtual void DeathEnd() override;
+	void SetHealth(float Amount);
+	void AddXP(int32 AddedXP) { XP += AddedXP; }
+
 };

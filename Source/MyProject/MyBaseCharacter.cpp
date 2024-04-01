@@ -99,16 +99,28 @@ void AMyBaseCharacter::OnOverlapBegin_AttackCapsule(UPrimitiveComponent* Overlap
 	if (OtherActor != this && OtherActor->IsA(ACharacter::StaticClass()))
 	{
 		if (GEngine)
+		{
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, TEXT("Hit Other Character"));
+		}
 
-		UGameplayStatics::ApplyDamage(OtherActor, // Damaged Actor
-			50, // Damage 
-			(Cast<APawn>(this)->GetController()), // Instigator (Controller)
-			this, // Damage Causer (Actor)
-			UDamageType::StaticClass()); // default damage type
-
+		if (DamageTypeClass)
+		{
+			UGameplayStatics::ApplyDamage(OtherActor, // Damaged Actor
+				Damage,    // Damage
+				GetController(), // Instigator's Controller
+				this,      // Damage Causer (Actor)
+				DamageTypeClass); // Damage Type Class
+		}
+		else
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("AMyBaseCharacter: DamageTypeClass not set!!!"));
+			}
+		}
 	}
 }
+
 
 
 void AMyBaseCharacter::Aim(bool Aim)
@@ -141,4 +153,31 @@ void AMyBaseCharacter::OnMontageBlendEndAttack(UAnimMontage* animMontage, bool b
 		EquippedWeapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GunHoldSocketLeft"));
 	}
+}
+
+float AMyBaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+	if (Health - DamageAmount <= 0.f)
+	{
+		Health = 0.f;
+		Die(DamageCauser);
+	}
+	else
+	{
+		Health -= DamageAmount;
+	}
+	return DamageAmount;
+}
+
+void AMyBaseCharacter::Die(AActor* Causer)
+{
+	AttackCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AMyBaseCharacter::DeathEnd()
+{
+	// Function definition presumably to be filled in later
 }

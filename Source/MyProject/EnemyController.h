@@ -18,6 +18,8 @@ public:
 
     UBlackboardComponent* GetBlackboard();
 
+    void StopBehaviorTree();
+
 protected:
     UPROPERTY(BlueprintReadWrite, Category = Behavior)
     class UBehaviorTreeComponent* BehaviorTreeComponent;

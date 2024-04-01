@@ -38,11 +38,21 @@ AMainCharacter::AMainCharacter()
 
 	StartFOV = FollowCamera->FieldOfView;
 	DesiredFOV = StartFOV;
+
+	Health = 85.f;
+	MaxHealth = 100.f;
+	Damage = 10.f;
+	XP = 0;
 }
 
 
 void AMainCharacter::Attack()
 {
+	if (Health <= 0.f)
+	{
+		return;
+	}
+
 	if (bIsAiming) // if aiming -> shoot
 	{
 		const float kLineTraceDistance = 10000.f;
@@ -100,6 +110,11 @@ void AMainCharacter::Attack()
 
 void AMainCharacter::Aim(bool Aim)
 {
+	if (Health <= 0.f)
+	{
+		return;
+	}
+
 	Super::Aim(Aim);
 	bUseControllerRotationYaw = Aim;
 	DesiredFOV = (Aim ? AimFOV : StartFOV);
@@ -128,4 +143,26 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AMainCharacter::SetHealth(float Amount)
+{
+	if (Amount > MaxHealth)
+	{
+		Health = MaxHealth;
+	}
+	else if (Amount < 0)
+	{
+		Health = 0;
+	}
+	else
+	{
+		Health = Amount;
+	}
+}
+
+void AMainCharacter::DeathEnd()
+{
+	Super::DeathEnd();
+	UKismetSystemLibrary::QuitGame(this, Cast<APlayerController>(GetController()), EQuitPreference::Quit, true);
 }

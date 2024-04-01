@@ -65,4 +65,30 @@ public:
 	virtual void Aim(bool Aim);
 
 	bool IsAttacking();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float Health;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float MaxHealth;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	float Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	TSubclassOf<UDamageType> DamageTypeClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Stats)
+	int32 XP;
+
+public:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void Die(AActor* Causer);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DeathEnd();
+
 };

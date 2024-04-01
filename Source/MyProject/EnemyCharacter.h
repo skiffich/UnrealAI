@@ -73,5 +73,6 @@ public:
     void AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-
+    virtual void Die(AActor* Causer) override;
+    virtual void DeathEnd() override;
 };

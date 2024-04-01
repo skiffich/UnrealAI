@@ -39,3 +39,8 @@ UBlackboardComponent* AEnemyController::GetBlackboard()
 {
     return BlackboardComponent;
 }
+
+void AEnemyController::StopBehaviorTree()
+{
+    BehaviorTreeComponent->StopTree();
+}

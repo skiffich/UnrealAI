@@ -61,5 +61,7 @@ void UMainAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		FRotator Interp = FMath::RInterpTo(FRotator(AimPitch, AimYaw, 0), DeltaRotation, DeltaTime, 15);
 		AimPitch = FMath::ClampAngle(Interp.Pitch, -90, 90);
 		AimYaw = FMath::ClampAngle(Interp.Yaw, -90, 90);
+
+		Health = BaseCharacter->Health;
 	}
 }

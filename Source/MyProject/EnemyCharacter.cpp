@@ -17,6 +17,11 @@ AEnemyCharacter::AEnemyCharacter()
 
     AttackSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AttackSphere"));
     AttackSphere->SetupAttachment(GetRootComponent());
+
+    Health = 20.f;
+    MaxHealth = 20.f;
+    XP = 10;
+    Damage = 20.f;
 }
 
 // Called when the game starts or when spawned
@@ -70,6 +75,31 @@ bool AEnemyCharacter::IsReadyToPatrol()
     }
     return false;
 }
+
+void AEnemyCharacter::DeathEnd()
+{
+    Super::DeathEnd();
+    //Destroy();
+}
+
+void AEnemyCharacter::Die(AActor* Causer)
+{
+    Super::Die(Causer);
+
+    AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    AttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+    {
+        EnemyController->StopBehaviorTree();
+    }
+
+    if (AMainCharacter* Main = Cast<AMainCharacter>(Causer))
+    {
+        Main->AddXP(XP);
+    }
+}
+
 
 void AEnemyCharacter::AgroSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
