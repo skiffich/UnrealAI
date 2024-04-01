@@ -13,17 +13,13 @@ UCLASS()
 class MYPROJECT_API AEnemyController : public AAIController
 {
 	GENERATED_BODY()
-	
-	FTimerHandle RandomWaypointTimerHandle;
+
+public:
+	AEnemyController();
+
+	virtual void OnPossess(APawn* InPawn) override;
 
 protected:
-	virtual void BeginPlay() override;
-
-	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
-
-	UFUNCTION()
-	void GoToRandomWaypoint();
-
-	UFUNCTION()
-	void GoToNextPatrolPoint();
+	UPROPERTY(BlueprintReadWrite, Category = Behavior)
+	class UBehaviorTreeComponent* BehaviorTreeComponent;
 };

@@ -11,6 +11,10 @@ class MYPROJECT_API AEnemyCharacter : public AMyBaseCharacter
 {
     GENERATED_BODY()
 
+public:
+    UPROPERTY(EditAnywhere, Category = "BehaviorTree")
+    class UBehaviorTree* BehaviorTree;
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;

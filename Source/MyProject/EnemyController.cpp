@@ -2,61 +2,32 @@
 
 
 #include "EnemyController.h"
-#include "NavigationSystem.h"
 #include "EnemyCharacter.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
-void AEnemyController::BeginPlay()
+
+AEnemyController::AEnemyController()
 {
-    Super::BeginPlay();
-    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToNextPatrolPoint, 3, false);
+	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComp"));
+	check(BehaviorTreeComponent);
 }
 
-void AEnemyController::GoToRandomWaypoint()
+void AEnemyController::OnPossess(APawn* InPawn)
 {
-    APawn* ControllingPawn = GetPawn();
-    if (ControllingPawn)
+    Super::OnPossess(InPawn);
+    if (InPawn == nullptr)
     {
-        UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-        if (NavSys)
+        return;
+    }
+
+    AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(InPawn);
+    if (Enemy)
+    {
+        if (Enemy->BehaviorTree)
         {
-            FVector Result;
-            bool bSuccess = NavSys->K2_GetRandomReachablePointInRadius(GetWorld(),
-                ControllingPawn->GetActorLocation(),
-                Result,
-                3000); // Radius
-            if (bSuccess)
-            {
-                MoveToLocation(Result);
-            }
+            UE_LOG(LogTemp, Display, TEXT("Start tree"));
+            BehaviorTreeComponent->StartTree(*(Enemy->BehaviorTree));
         }
     }
-}
-
-void AEnemyController::GoToNextPatrolPoint()
-{
-    AEnemyCharacter* ControllingEnemy = Cast<AEnemyCharacter>(GetPawn());
-    if (ControllingEnemy)
-    {
-        if (!ControllingEnemy->IsReachedAllPatrolPoints())
-        {
-            UE_LOG(LogTemp, Display, TEXT("Go to NextPatrolLocation"));
-            MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
-        }
-        else if (!ControllingEnemy->IsReadyToPatrol())
-        {
-            UE_LOG(LogTemp, Display, TEXT("Go to RandomWaypoint"));
-            GoToRandomWaypoint();
-        }
-        else
-        {
-            UE_LOG(LogTemp, Display, TEXT("Go to NextPatrolLocation"));
-            MoveToLocation(ControllingEnemy->GetNextPatrolLocation());
-        }
-    }
-}
-
-void AEnemyController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{
-    Super::OnMoveCompleted(RequestID, Result);
-    GetWorld()->GetTimerManager().SetTimer(RandomWaypointTimerHandle, this, &AEnemyController::GoToNextPatrolPoint, 3, false);
 }
