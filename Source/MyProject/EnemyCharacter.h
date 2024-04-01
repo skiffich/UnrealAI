@@ -44,4 +44,20 @@ private:
 
     int CurrentPatrolIndex = 0;
     int CurrentMoveIndex = 0;
+
+public:
+    AEnemyCharacter();
+
+    // Used to chase the player
+    UPROPERTY(VisibleAnywhere, Category = "BehaviorTree")
+    class USphereComponent* AgroSphere;
+
+    UFUNCTION()
+    void AgroSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+    UFUNCTION()
+    void AgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 };

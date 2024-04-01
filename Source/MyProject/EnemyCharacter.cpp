@@ -2,6 +2,19 @@
 
 
 #include "EnemyCharacter.h"
+#include "Components/SphereComponent.h"
+#include "MainCharacter.h"
+#include "EnemyController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
+AEnemyCharacter::AEnemyCharacter()
+    : Super()
+{
+    PrimaryActorTick.bCanEverTick = true;
+
+    AgroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroSphere"));
+    AgroSphere->SetupAttachment(GetRootComponent());
+}
 
 // Called when the game starts or when spawned
 void AEnemyCharacter::BeginPlay()
@@ -14,6 +27,9 @@ void AEnemyCharacter::BeginPlay()
     {
         PatrolPoints.Add(PatrolPoint + GetActorLocation());
     }
+
+    AgroSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::AgroSphereBeginOverlap);
+    AgroSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::AgroSphereEndOverlap);
 }
 
 const FVector& AEnemyCharacter::GetNextPatrolLocation()
@@ -49,3 +65,30 @@ bool AEnemyCharacter::IsReadyToPatrol()
     return false;
 }
 
+void AEnemyCharacter::AgroSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor)
+    {
+        if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
+        {
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->GetBlackboard()->SetValueAsObject(TEXT("TargetActor"), Main);
+            }
+        }
+    }
+}
+
+void AEnemyCharacter::AgroSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    if (OtherActor)
+    {
+        if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
+        {
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->GetBlackboard()->ClearValue(TEXT("TargetActor"));
+            }
+        }
+    }
+}
