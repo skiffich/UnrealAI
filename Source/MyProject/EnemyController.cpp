@@ -11,6 +11,9 @@ AEnemyController::AEnemyController()
 {
 	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComp"));
 	check(BehaviorTreeComponent);
+
+    BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComp"));
+    check(BlackboardComponent);
 }
 
 void AEnemyController::OnPossess(APawn* InPawn)
@@ -26,8 +29,13 @@ void AEnemyController::OnPossess(APawn* InPawn)
     {
         if (Enemy->BehaviorTree)
         {
-            UE_LOG(LogTemp, Display, TEXT("Start tree"));
+            BlackboardComponent->InitializeBlackboard(*(Enemy->BehaviorTree->BlackboardAsset));
             BehaviorTreeComponent->StartTree(*(Enemy->BehaviorTree));
         }
     }
+}
+
+UBlackboardComponent* AEnemyController::GetBlackboard()
+{
+    return BlackboardComponent;
 }

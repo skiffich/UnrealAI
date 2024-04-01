@@ -6,20 +6,23 @@
 #include "AIController.h"
 #include "EnemyController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class MYPROJECT_API AEnemyController : public AAIController
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AEnemyController();
+    AEnemyController();
 
-	virtual void OnPossess(APawn* InPawn) override;
+    virtual void OnPossess(APawn* InPawn) override;
+
+    UBlackboardComponent* GetBlackboard();
 
 protected:
-	UPROPERTY(BlueprintReadWrite, Category = Behavior)
-	class UBehaviorTreeComponent* BehaviorTreeComponent;
+    UPROPERTY(BlueprintReadWrite, Category = Behavior)
+    class UBehaviorTreeComponent* BehaviorTreeComponent;
+
+    UPROPERTY(BlueprintReadWrite, Category = Behavior)
+    class UBlackboardComponent* BlackboardComponent;
 };
+
