@@ -14,6 +14,9 @@ AEnemyCharacter::AEnemyCharacter()
 
     AgroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroSphere"));
     AgroSphere->SetupAttachment(GetRootComponent());
+
+    AttackSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AttackSphere"));
+    AttackSphere->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +33,9 @@ void AEnemyCharacter::BeginPlay()
 
     AgroSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::AgroSphereBeginOverlap);
     AgroSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::AgroSphereEndOverlap);
+
+    AttackSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::AttackSphereBeginOverlap);
+    AttackSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::AttackSphereEndOverlap);
 }
 
 const FVector& AEnemyCharacter::GetNextPatrolLocation()
@@ -88,6 +94,36 @@ void AEnemyCharacter::AgroSphereEndOverlap(UPrimitiveComponent* OverlappedCompon
             if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
             {
                 EnemyController->GetBlackboard()->ClearValue(TEXT("TargetActor"));
+            }
+        }
+    }
+}
+
+void AEnemyCharacter::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor)
+    {
+        if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
+        {
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->GetBlackboard()->SetValueAsBool(TEXT("InAttackRange"), true);
+            }
+        }
+    }
+}
+
+void AEnemyCharacter::AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    if (OtherActor)
+    {
+        if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
+        {
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->GetBlackboard()->SetValueAsBool(TEXT("InAttackRange"), false);
             }
         }
     }
