@@ -4,6 +4,8 @@
 #include "MyBaseCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "HealthBar.h"
+#include "Components/WidgetComponent.h"
 
 
 // Sets default values
@@ -23,6 +25,9 @@ AMyBaseCharacter::AMyBaseCharacter()
 
 	EquippedWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EquippedWeapon"));
 	BackWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BackWeapon"));
+
+	HealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	HealthWidgetComp->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +35,9 @@ void AMyBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMesh()->GetAnimInstance()->OnMontageBlendingOut.AddDynamic(this, &AMyBaseCharacter::OnMontageBlendEndAttack);
+
+	UHealthBar* HealthBar = Cast<UHealthBar>(HealthWidgetComp->GetUserWidgetObject());
+	HealthBar->SetOwnerCharacter(this);
 }
 
 void AMyBaseCharacter::OnConstruction(const FTransform& Transform)
@@ -173,6 +181,8 @@ float AMyBaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 
 void AMyBaseCharacter::Die(AActor* Causer)
 {
+	HealthWidgetComp->SetVisibility(false);
+
 	AttackCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

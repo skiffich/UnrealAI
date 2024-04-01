@@ -91,4 +91,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DeathEnd();
 
+public:
+	UPROPERTY(VisibleAnywhere)
+	class UWidgetComponent* HealthWidgetComp;
+
 };
