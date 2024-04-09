@@ -87,4 +87,8 @@ public:
 
     virtual void Die(AActor* Causer) override;
     virtual void DeathEnd() override;
+
+private:
+    FTimerHandle GameOverTimerHandle;
+    void QuitGame();
 };

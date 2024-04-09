@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameOverWidget.h"
 #include "MyBaseCharacter.generated.h"
 
 UCLASS()
@@ -98,5 +99,9 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere)
 	class UWidgetComponent* HealthWidgetComp;
+
+	// Add a property to hold the widget class reference
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UGameOverWidget> GameOverWidgetClass;
 
 };

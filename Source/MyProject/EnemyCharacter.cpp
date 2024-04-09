@@ -88,6 +88,32 @@ void AEnemyCharacter::DeathEnd()
     //Destroy();
 }
 
+void AEnemyCharacter::QuitGame()
+{
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (PC && GameOverWidgetClass != nullptr) // Check if the GameOverWidgetClass is assigned
+    {
+        UUserWidget* GameOverScreen = CreateWidget<UUserWidget>(PC, GameOverWidgetClass);
+        if (GameOverScreen)
+        {
+            PC->SetIgnoreMoveInput(true);
+            if (AMainCharacter* mainCh = Cast<AMainCharacter>(PC->GetPawn()))
+            {
+                mainCh->SetHealth(0.0f);
+            }
+            GameOverScreen->AddToViewport();
+            PC->SetShowMouseCursor(true);
+            FInputModeUIOnly InputMode;
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
+
+            if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
+            {
+                EnemyController->StopBehaviorTree();
+            }
+        }
+    }
+}
+
 void AEnemyCharacter::Die(AActor* Causer)
 {
     Super::Die(Causer);
@@ -116,6 +142,8 @@ void AEnemyCharacter::AgroSphereBeginOverlap(UPrimitiveComponent* OverlappedComp
             if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
             {
                 EnemyController->GetBlackboard()->SetValueAsObject(TEXT("TargetActor"), Main);
+
+                GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &AEnemyCharacter::QuitGame, 10.0f, false);
             }
         }
     }
@@ -130,6 +158,8 @@ void AEnemyCharacter::AgroSphereEndOverlap(UPrimitiveComponent* OverlappedCompon
             if (AEnemyController* EnemyController = Cast<AEnemyController>(GetController()))
             {
                 EnemyController->GetBlackboard()->ClearValue(TEXT("TargetActor"));
+
+                GetWorld()->GetTimerManager().ClearTimer(GameOverTimerHandle);
             }
         }
     }
@@ -138,7 +168,12 @@ void AEnemyCharacter::AgroSphereEndOverlap(UPrimitiveComponent* OverlappedCompon
 void AEnemyCharacter::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor)
+    if (OtherActor && OtherActor != this && OtherActor->IsA(AMainCharacter::StaticClass()))
+    {
+        QuitGame();
+    }
+
+    /*if (OtherActor)
     {
         if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
         {
@@ -147,7 +182,7 @@ void AEnemyCharacter::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedCo
                 EnemyController->GetBlackboard()->SetValueAsBool(TEXT("InAttackRange"), true);
             }
         }
-    }
+    }*/
 }
 
 void AEnemyCharacter::AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
