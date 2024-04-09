@@ -97,7 +97,7 @@ void AMyBaseCharacter::Attack()
 			HitDetails, // FHitResult object that will be populated with hit info
 			Start, // Start position
 			End, // End position
-			ECC_Camera, // Camera channel
+			ECC_Pawn, // Camera channel
 			TraceParams // Additional trace settings
 		);
 
@@ -116,7 +116,7 @@ void AMyBaseCharacter::Attack()
 			}
 
 			UGameplayStatics::ApplyDamage(HitDetails.GetActor(), // Damaged Actor
-				25, // Damage
+				Damage, // Damage
 				GetController(), // Instigator (Controller)
 				this, // Damage Causer (Actor)
 				DamageTypeClass); // default damage type

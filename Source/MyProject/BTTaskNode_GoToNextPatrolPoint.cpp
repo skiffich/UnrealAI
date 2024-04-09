@@ -55,6 +55,11 @@ EBTNodeResult::Type UBTTaskNode_GoToNextPatrolPoint::ExecuteTask(UBehaviorTreeCo
                 // Notify Behavior Tree that the task is completed
                 FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
             }
+            else if (Result.Code == EPathFollowingResult::Aborted)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("GoToNextPatrolPoint Aborted"));
+                FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
+            }
             else
             {
                 FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
