@@ -23,11 +23,6 @@ AAmmo::AAmmo()
     CollisionSphere->SetupAttachment(RootComponent);
     CollisionSphere->InitSphereRadius(60.f);
     CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAmmo::OnOverlapBegin);
-
-    // Initialize the AI Perception Stimuli Source component
-    StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
-    StimuliSource->bAutoRegister = true;
-    StimuliSource->RegisterForSense(UAISense_Sight::StaticClass());
 }
 
 // Handle overlap
@@ -38,6 +33,9 @@ void AAmmo::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
         // Assuming "APlayerCharacter" is your player class
         if (OtherActor->IsA(AMyBaseCharacter::StaticClass()))
         {
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%s picked up"), *GetName()));
+            UE_LOG(LogTemp, Display, TEXT("%s picked up"), *GetName());
+
             Destroy();
         }
     }
