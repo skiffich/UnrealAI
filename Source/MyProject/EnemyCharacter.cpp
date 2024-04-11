@@ -143,7 +143,7 @@ void AEnemyCharacter::AgroSphereBeginOverlap(UPrimitiveComponent* OverlappedComp
             {
                 EnemyController->GetBlackboard()->SetValueAsObject(TEXT("TargetActor"), Main);
 
-                GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &AEnemyCharacter::QuitGame, 10.0f, false);
+                //GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &AEnemyCharacter::QuitGame, 10.0f, false);
             }
         }
     }
@@ -168,12 +168,12 @@ void AEnemyCharacter::AgroSphereEndOverlap(UPrimitiveComponent* OverlappedCompon
 void AEnemyCharacter::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor != this && OtherActor->IsA(AMainCharacter::StaticClass()))
+    /*if (OtherActor && OtherActor != this && OtherActor->IsA(AMainCharacter::StaticClass()))
     {
         QuitGame();
-    }
+    }*/
 
-    /*if (OtherActor)
+    if (OtherActor)
     {
         if (AMainCharacter* Main = Cast<AMainCharacter>(OtherActor))
         {
@@ -182,7 +182,7 @@ void AEnemyCharacter::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedCo
                 EnemyController->GetBlackboard()->SetValueAsBool(TEXT("InAttackRange"), true);
             }
         }
-    }*/
+    }
 }
 
 void AEnemyCharacter::AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
