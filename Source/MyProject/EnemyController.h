@@ -21,10 +21,36 @@ public:
     void StopBehaviorTree();
 
 protected:
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
+
+private:
+    UPROPERTY(VisibleAnywhere, Category = "AI")
+    bool bCanSeePlayer;
+
+    UPROPERTY(VisibleAnywhere, Category = "AI")
+    bool bSoundHeard;
+
+    UPROPERTY(VisibleAnywhere, Category = "AI")
+    FTimerHandle HearingTimer;
+
+
+protected:
     UPROPERTY(BlueprintReadWrite, Category = Behavior)
     class UBehaviorTreeComponent* BehaviorTreeComponent;
 
     UPROPERTY(BlueprintReadWrite, Category = Behavior)
     class UBlackboardComponent* BlackboardComponent;
+
+protected:
+    UPROPERTY(VisibleDefaultsOnly, Category = "AI")
+    class UAISenseConfig_Sight* SightConfig;
+
+    UPROPERTY(VisibleDefaultsOnly, Category = "AI")
+    class UAISenseConfig_Hearing* HearingConfig;
+
+public:
+    UFUNCTION()
+    void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 };
 
