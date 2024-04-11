@@ -33,6 +33,7 @@ AEnemyController::AEnemyController()
     // Configuring the sight sense
     SightConfig->SightRadius = 600.0f;
     SightConfig->LoseSightRadius = 700.0f;
+    SightConfig->PeripheralVisionAngleDegrees = 45.0f;
     SightConfig->DetectionByAffiliation.bDetectEnemies = true;
     SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
     SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
